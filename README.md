@@ -128,3 +128,87 @@ Y finalizada su configuración, habilitamos el Servicio LogStash:
 systemctl enable logstash 
 systemctl start logstash
 ```
+
+- Configuración del Servicio RSysLog para consumir desde LogStash ( Ya instalado en Debian 11 Bullseye ):
+
+Antes de configurar el Servicio de rsyslog pararemos los servicios de la Pila SELK instalados previamente:
+
+```
+systemctl stop snort elasticsearch logstash rsyslog
+```
+
+Una vez parados los Servicios editaremos el archivo */etc/rsyslog.d/snort.conf* y agregaremos:
+
+```
+local6.* /var/log/snort_alerts.log
+```
+
+Ya sólo nos quedará la configuración de SNORT para que escriba sobre el pipe local6 de rsyslog:
+
+Buscaremos la linea 559 del archivo */etc/snort/snort.conf* y la cambiaremos a:
+
+```
+output alert_syslog: LOG_LOCAL6 LOG_ALERT
+```
+
+- Configuración del parser GROK para preparar su consumo desde LogStash:
+
+Creamos el archivo */etc/logstash/conf.d/logstash.conf* y le agregamos:
+
+```
+input {
+file {
+path => ["/var/log/snort_alerts.log"]
+start_position => beginning
+}
+}
+filter {
+grok {
+match => {"message" => "%{GREEDYDATA:cadena}"}
+}
+}
+output { elasticsearch {
+hosts => [ "http://192.168.1.254:9200" ] <- Ejemplo. Cambiar según configuración del Laboratorio de Pruebas.
+index => "logstash"
+}
+}
+```
+**IMPORTANTE**
+
+Habrá que darle permisos de lectura a todos para que desde logstash se pueda leer el archivo generado por rsyslog:
+
+```
+touch /var/log/snort_alerts.log
+chmod 555 /var/log/snort_alerts.log
+```
+
+Y una vez realizadas las configuraciones previas ya podremos iniciar los servicios SELK instalados hasta ahora:
+
+```
+systemctl start rsyslog snort elasticsearch logstash 
+
+```
+
+- Instalación y configuración de Kibana
+
+```
+apt install kibana
+```
+
+Una vez instalado kibana procedemos a su configuración agregando al archivo */etc/kibana/kibana.yml* :
+
+```
+server.port: 5601
+server.host: "192.168.1.254"
+server.name: "host.siem.ejemplo.net"
+elasticsearch.hosts: "http://192.168.1.254:9200"
+logging.dest: /var/log/kibana.log
+```
+
+Y ya sólo nos quedará habilitar el servicio y levantarlo manualmente:
+
+```
+systemctl start kibana
+```
+
+Si todo va bien, podremos acceder desde el Equipo del Analista a la dirección web http://192.168.1.254:5601 para comprobar que KIBANA es accesible correctamente.
