@@ -14,6 +14,23 @@ IMPORTANTE: Recomendables 8GB de RAM y 4 CPU.
  - Red Analista ( Puente )  ( Acceso a Kibana desde el Equipo HOST )
  - Red Monitorización ( Interna ) ( Perímetro a Monitorizar )
 
+Configuración utilizada en este manual: ( */etc/network/interfaces* )
+
+```
+#Perimetro interno a monitorizar
+allow-hotplug enp0s3
+iface enp0s3 inet static
+address 192.168.254.254
+netmask 255.255.255.0
+
+#Configurar en Estática dependiendo del entorno local
+allow-hotplug enp0s8
+iface enp0s8 inet static
+address 192.168.1.254
+netmask 255.255.255.0
+gateway 192.168.1.1
+```
+
 **Instalar Debian sobre VirtualBOX**
 
 Para optimizar el rendimiento de la Pila de Servicios realizaremos una instalación básica sin entorno gráfico.
@@ -55,4 +72,59 @@ alert icmp any any -> any any (msg:"ICMP Packet detected"; sid:3000001;)
 
 Se trata de una regla genérica para detectar PINGs contra el propio SNORT.
 
+**Configuración del repositorio Oficial de Elastic para versión 7 ( Elastic , Logstash , Kibana )**
 
+[Fuente original] (https://www.elastic.co/guide/en/elasticsearch/reference/7.16/deb.html#deb-repo)
+
+Instalaremos la clave pública del repositorio oficial de Elastic:
+
+```
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-7.x.list
+apt update
+```
+
+**Pasos de instalación y configuración de la Pila ELK:**
+
+- Instalación del Servicio ElasticSearch:
+
+```
+apt install elasticsearch
+```
+
+Una vez instalado **elasticsearch** procedemos a su configuración editando el archivo */etc/elasticsearch/elasticsearch.yml* :
+
+cluster.name: siem.ejemplo.net 
+node.name: host.siem.ejemplo.net
+network.host: [192.168.1.254]  <- Ejemplo. Direccion IP que será accesible por parte del Analista.
+discovery.type: single-node
+xpack.ml.enabled: false
+
+Y finalizada la configuración, habilitamos el Servicio de Elastic:
+
+```
+systemctl enable elasticsearch
+systemctl start elascticsearch
+```
+
+Ahora podremos comprobar su correcto funcionamiento accediendo desde el Navegador del Analista a la dirección ( http://192.168.1.254:9200 )
+
+- Instalación del Servicio LogStash:
+
+```
+apt install logstash
+```
+
+Una vez instalado **logstash** procedemos a su configuración añadiendo al archivo */etc/logstash/logstash.yml* :
+
+node.name: siem.ejemplo.net
+http.host: "[192.168.1.254]"
+xpack.monitoring.enabled: false
+xpack.management.enabled: false
+
+Y finalizada su configuración, habilitamos el Servicio LogStash:
+
+```
+systemctl enable logstash 
+systemctl start logstash
+```
