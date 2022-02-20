@@ -27,7 +27,32 @@ Para habilitar *sudo* en Debian habrá que ejecutar los siguientes comandos ( ca
 ```
 apt update
 apt install sudo
-usermod -aG nombre_usuario sudo
+usermod -aG sudo *nombre_usuario*
 ```
 
 **Dependencias para la instalación de la Pila de Servicios**
+
+Será conveniente instalar las siguientes dependencias previamente a la instalación de la Pila SELK (sin sudo) :
+
+```
+apt update
+apt install default-jdk-headless libjffi-java libjffi-jni gnupg2 apt-transport-https
+```
+
+**Instalación de SNORT**
+
+```
+apt install snort
+```
+
+Cuando el proceso de instalación de SNORT nos solicite una red a monitorizar es conveniente cambiar el direccionamiento por la red interna que queramos monitorizar. ( Por ejemplo: 192.168.254.0/24 )
+
+Una vez instalado SNORT agregamos en */etc/snort/rules/local.rules* la siguiente alerta:
+
+```
+alert icmp any any -> any any (msg:"ICMP Packet detected"; sid:3000001;)
+```
+
+Se trata de una regla genérica para detectar PINGs contra el propio SNORT.
+
+
