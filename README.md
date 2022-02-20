@@ -94,11 +94,13 @@ apt install elasticsearch
 
 Una vez instalado **elasticsearch** procedemos a su configuración editando el archivo */etc/elasticsearch/elasticsearch.yml* :
 
+```
 cluster.name: siem.ejemplo.net 
 node.name: host.siem.ejemplo.net
 network.host: [192.168.1.254]  <- Ejemplo. Direccion IP que será accesible por parte del Analista.
 discovery.type: single-node
 xpack.ml.enabled: false
+```
 
 Y finalizada la configuración, habilitamos el Servicio de Elastic:
 
@@ -117,10 +119,12 @@ apt install logstash
 
 Una vez instalado **logstash** procedemos a su configuración añadiendo al archivo */etc/logstash/logstash.yml* :
 
+```
 node.name: siem.ejemplo.net
 http.host: "[192.168.1.254]"
 xpack.monitoring.enabled: false
 xpack.management.enabled: false
+```
 
 Y finalizada su configuración, habilitamos el Servicio LogStash:
 
