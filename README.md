@@ -1,4 +1,4 @@
-# Configuración de una Pila de Servicios IDS ( SNORT-Elastic-Logstash-Kibana basado en Debian 11 Bullseye ) #
+# Configuración de una Pila de Servicios IDS ( SNORT-Elastic-Logstash-Kibana ) basado en Debian 11 Bullseye #
 
 ## Instalación Debian 11 Bullseye ##
 
@@ -190,7 +190,7 @@ systemctl start rsyslog snort elasticsearch logstash
 Habrá que darle permisos de lectura a todos para que desde logstash se pueda leer el archivo generado por rsyslog:
 
 ```
-chmod 555 /var/log/snort_alerts.log
+chmod 665 /var/log/snort_alerts.log
 ```
 
 - Instalación y configuración de Kibana
