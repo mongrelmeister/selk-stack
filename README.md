@@ -106,7 +106,7 @@ Y finalizada la configuración, habilitamos el Servicio de Elastic:
 
 ```
 systemctl enable elasticsearch
-systemctl start elascticsearch
+systemctl start elasticsearch
 ```
 
 Ahora podremos comprobar su correcto funcionamiento accediendo desde el Navegador del Analista a la dirección ( http://192.168.1.254:9200 )
