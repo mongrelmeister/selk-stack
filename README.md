@@ -177,20 +177,20 @@ index => "logstash"
 }
 }
 ```
-**IMPORTANTE**
-
-Habrá que darle permisos de lectura a todos para que desde logstash se pueda leer el archivo generado por rsyslog:
-
-```
-touch /var/log/snort_alerts.log
-chmod 555 /var/log/snort_alerts.log
-```
 
 Y una vez realizadas las configuraciones previas ya podremos iniciar los servicios SELK instalados hasta ahora:
 
 ```
 systemctl start rsyslog snort elasticsearch logstash 
 
+```
+
+**IMPORTANTE**
+
+Habrá que darle permisos de lectura a todos para que desde logstash se pueda leer el archivo generado por rsyslog:
+
+```
+chmod 555 /var/log/snort_alerts.log
 ```
 
 - Instalación y configuración de Kibana
